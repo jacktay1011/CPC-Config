@@ -33,6 +33,66 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+/* ── Dark mode overrides ────────────────────────── */
+body.dark {
+  --bg:        #0F1117;
+  --surface:   #1A1D27;
+  --surface2:  #21253A;
+  --border:    #2E3348;
+  --border2:   #3A4060;
+  --navy:      #1B3A6B;
+  --navy-lt:   #2451A0;
+  --blue:      #3B82F6;
+  --blue-lt:   #1E2A45;
+  --blue-mid:  #2D4070;
+  --green:     #22C55E;
+  --green-lt:  #14281E;
+  --red:       #EF4444;
+  --red-lt:    #2D1515;
+  --amber:     #F59E0B;
+  --amber-lt:  #2D2010;
+  --text:      #E8ECF4;
+  --text2:     #A0AABF;
+  --muted:     #5A6480;
+}
+
+/* ── Theme toggle ───────────────────────────────── */
+.theme-toggle {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px 5px 8px;
+  cursor: pointer;
+  font-size: 12px; font-weight: 600;
+  color: var(--text2);
+  transition: all 0.15s;
+  user-select: none;
+  white-space: nowrap;
+}
+.theme-toggle:hover { border-color: var(--border2); color: var(--text); }
+
+.toggle-track {
+  width: 32px; height: 18px;
+  background: var(--border2);
+  border-radius: 20px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+body.dark .toggle-track { background: var(--blue); }
+
+.toggle-thumb {
+  width: 13px; height: 13px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2.5px; left: 2.5px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+body.dark .toggle-thumb { transform: translateX(14px); }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -414,10 +474,51 @@ select option { background: #fff; }
 .text-green { color: var(--green); }
 .section-gap { display: flex; flex-direction: column; gap: 16px; }
 
+/* ── T8 override toggle ─────────────────────────── */
+.t8-toggle-label {
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; user-select: none;
+  padding: 10px 14px;
+  background: var(--amber-lt);
+  border: 1.5px solid #FDE68A;
+  border-radius: 8px;
+}
+.t8-track {
+  width: 36px; height: 20px; flex-shrink: 0;
+  background: var(--border2); border-radius: 20px;
+  position: relative; transition: background 0.2s;
+}
+.t8-track.t8-on { background: var(--amber); }
+.t8-thumb {
+  width: 15px; height: 15px; background: #fff;
+  border-radius: 50%; position: absolute;
+  top: 2.5px; left: 2.5px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.t8-track.t8-on .t8-thumb { transform: translateX(16px); }
+
 /* scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* dark mode: sidebar adjustments */
+body.dark .sidebar { background: #111420; }
+body.dark .logo-mark { background: var(--blue); }
+body.dark input, body.dark select { background: var(--surface2); color: var(--text); border-color: var(--border); }
+body.dark input::placeholder { color: var(--muted); }
+body.dark select option { background: #1A1D27; color: var(--text); }
+body.dark .mode-card { background: var(--surface); }
+body.dark .mode-card.selected { background: var(--blue-lt); }
+body.dark .upload-zone { background: var(--surface2); }
+body.dark .preview-table th { background: var(--surface2); }
+body.dark .file-loaded { background: var(--green-lt); border-color: #1A4030; }
+body.dark .btn-ghost { background: var(--surface2); color: var(--text2); border-color: var(--border); }
+body.dark .btn-ghost:hover { background: var(--surface); color: var(--text); }
+body.dark .btn-outline-blue { background: var(--blue-lt); color: #93C5FD; border-color: var(--blue-mid); }
+body.dark .stat-box { background: var(--surface); }
+body.dark .action-bar { background: var(--surface2); }
 </style>
 </head>
 <body>
@@ -450,23 +551,18 @@ select option { background: #fff; }
       <div class="nav-item" onclick="downloadTemplate()">
         <span class="ni">📥</span> Download Template
       </div>
+      <div class="nav-item" onclick="downloadRulesRef()">
+        <span class="ni">📋</span> CPC Rules Reference
+      </div>
     </div>
 
     <div class="sidebar-footer">
       <div class="nav-label" style="margin-bottom:8px">Ownership Models</div>
       <div class="nav-item active" style="cursor:default">
-        <span class="ni">✅</span> USM · One-Off Upfront
+        <span class="ni">✅</span> <span id="sidebarUSMLabel">USM · Non Consignment · Upfront</span>
       </div>
       <div class="nav-item active" style="cursor:default">
         <span class="ni">✅</span> UPL · Instalment
-      </div>
-      <div class="nav-item nav-disabled">
-        <span class="ni">🔒</span> No Upfront
-        <span class="nav-badge badge-soon">Soon</span>
-      </div>
-      <div class="nav-item nav-disabled">
-        <span class="ni">🔒</span> Dealer Prihatin+
-        <span class="nav-badge badge-soon">Soon</span>
       </div>
     </div>
   </aside>
@@ -480,6 +576,10 @@ select option { background: #fff; }
         <div>
           <div class="page-title" id="pageTitle">New Configuration Entry</div>
           <div class="page-sub"  id="pageSub">Fill in device &amp; pricing details to generate the output config file</div>
+        </div>
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle day / night mode">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span id="themeLabel">Day</span>
         </div>
       </div>
     </div>
@@ -499,32 +599,47 @@ select option { background: #fff; }
           </div>
         </div>
         <div class="card-body">
-          <div class="mode-grid">
-            <div class="mode-card selected" id="modeUpfront" onclick="selectMode('Upfront')">
+          <div class="mode-grid" style="grid-template-columns:1fr 1fr">
+            <div class="mode-card selected" id="modeUSM" onclick="selectMode('Upfront')">
               <div class="selected-check">✓</div>
               <div class="mode-icon">💳</div>
-              <div class="mode-name">One-Off · Upfront</div>
-              <div class="mode-alias">USM / U SaveMore</div>
+              <div class="mode-name">USM · One-Off</div>
+              <div class="mode-alias">U SaveMore</div>
               <div class="mode-pill pill-live">Active</div>
             </div>
-            <div class="mode-card" id="modeInstalment" onclick="selectMode('Instalment')">
+            <div class="mode-card" id="modeUPL" onclick="selectMode('Instalment')">
               <div class="selected-check">✓</div>
               <div class="mode-icon">📆</div>
-              <div class="mode-name">Instalment</div>
-              <div class="mode-alias">UPL / U PayLater</div>
+              <div class="mode-name">UPL · Instalment</div>
+              <div class="mode-alias">U PayLater</div>
               <div class="mode-pill pill-live">Active</div>
             </div>
-            <div class="mode-card mode-disabled">
-              <div class="mode-icon">🔓</div>
-              <div class="mode-name">No Upfront</div>
-              <div class="mode-alias">USM</div>
-              <div class="mode-pill pill-soon">Coming Soon</div>
+          </div>
+
+          <!-- USM sub-selections — shown only when USM is selected -->
+          <div id="usmSubRow" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border); display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.04em">Consignment <span class="req">*</span></label>
+              <select id="usmConsignment" onchange="updateUSMSub()">
+                <option value="Non Consignment">Non Consignment</option>
+                <option value="Consignment (Others)">Consignment (Others)</option>
+                <option value="Consignment (Dealers)">Consignment (Dealers)</option>
+              </select>
             </div>
-            <div class="mode-card mode-disabled">
-              <div class="mode-icon">🤝</div>
-              <div class="mode-name">Dealer Prihatin+</div>
-              <div class="mode-alias">USM</div>
-              <div class="mode-pill pill-soon">Coming Soon</div>
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.04em">Upfront <span class="req">*</span></label>
+              <select id="usmUpfront" onchange="updateUSMSub(); updateModeUI()">
+                <option value="Upfront">Upfront</option>
+                <option value="No Upfront">No Upfront</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.04em">Agreement Tag <span class="req">*</span></label>
+              <select id="usmAgreementTag" onchange="updateUSMSub()">
+                <option value="Upfront">Upfront</option>
+                <option value="No Upfront">No Upfront</option>
+                <option value="Dealer Prihatin Plus">Dealer Prihatin Plus</option>
+              </select>
             </div>
           </div>
         </div>
@@ -551,8 +666,9 @@ select option { background: #fff; }
             </div>
             <div class="form-group">
               <label>Brand <span class="req">*</span></label>
-              <input id="brand" type="text" placeholder="e.g. GOOGLE"
-                oninput="autoUpper(this)" onblur="validateField(this)">
+              <select id="brand" onchange="validateField(this)">
+                <option value="">Select…</option>
+              </select>
             </div>
             <div class="form-group">
               <label>SKU Code <span class="req">*</span></label>
@@ -566,8 +682,9 @@ select option { background: #fff; }
             </div>
             <div class="form-group">
               <label>Storage <span class="req">*</span></label>
-              <input id="storage" type="text" placeholder="e.g. 512GB"
-                oninput="autoUpper(this)" onblur="validateField(this)">
+              <select id="storage" onchange="validateField(this)">
+                <option value="">Select…</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Color <span class="req">*</span></label>
@@ -597,13 +714,10 @@ select option { background: #fff; }
               <label>Plan <span class="req">*</span></label>
               <select id="plan" onchange="validateField(this)">
                 <option value="">Select…</option>
-                <option>U Postpaid 68</option>
-                <option>U Postpaid 98</option>
-                <option>U Postpaid Borneo 68</option>
-                <option>U Family 128</option>
-                <option>U Biz 68</option>
-                <option>U Biz 98</option>
-                <option>U Biz Share 128</option>
+                <option>Ultra Postpaid 68</option>
+                <option>Ultra Postpaid Borneo 68</option>
+                <option>ULTRA Global 98</option>
+                <option>ULTRA Family 128</option>
               </select>
             </div>
             <div class="form-group">
@@ -630,10 +744,49 @@ select option { background: #fff; }
                 placeholder="e.g. 864" onblur="validateField(this)">
               <div class="field-hint" id="upfrontHint"></div>
             </div>
+            <div class="form-group" id="rebateTenureGroup">
+              <label>
+                Rebate Tenure (months)
+                <span class="req" id="rebateTenureReq">*</span>
+              </label>
+              <select id="rebateTenure" onchange="validateField(this)">
+                <option value="">Select…</option>
+                <option>6</option>
+                <option>12</option>
+                <option>24</option>
+                <option>36</option>
+              </select>
+              <div class="field-hint" id="rebateTenureHint"></div>
+            </div>
+            <div class="form-group" id="noUpfrontGroup">
+              <label>
+                No Upfront Payment (RM)
+                <span class="req" id="noUpfrontReq">*</span>
+              </label>
+              <input id="noUpfrontPayment" type="number" min="0" step="0.01"
+                placeholder="e.g. 2059.00" onblur="validateField(this)">
+              <div class="field-hint" id="noUpfrontHint"></div>
+            </div>
             <div class="form-group">
               <label>Campaign Code <span class="opt">(optional)</span></label>
               <input id="campaignCode" type="text" placeholder="Leave blank if none">
             </div>
+          </div>
+          <!-- T8 override row — only shown for Instalment -->
+          <div id="t8OverrideRow" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+            <label class="t8-toggle-label" for="t8Override">
+              <input type="checkbox" id="t8Override" style="display:none"
+                onchange="document.getElementById('t8OverrideLabel').classList.toggle('t8-on', this.checked)">
+              <div class="t8-track" id="t8OverrideLabel">
+                <div class="t8-thumb"></div>
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:600; color:var(--text)">Override CUST_GROUP to T8</div>
+                <div style="font-size:11px; color:var(--muted); margin-top:1px">
+                  If enabled, output will be <span style="font-family:'JetBrains Mono',monospace; font-size:10px">Tier 1|Tier 2|...|Tier 8</span> — confirm with your team before enabling
+                </div>
+              </div>
+            </label>
           </div>
         </div>
       </div>
@@ -785,49 +938,298 @@ select option { background: #fff; }
 <div id="toast" class="toast hidden"></div>
 
 <script>
-// ═══════════════════════════════════════════════
-// LOOKUP TABLES
-// ═══════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  RULES BLOCK — all lookup tables live here                          ║
+// ║  To update a rule: find the relevant table below, edit the value,   ║
+// ║  save the file, and redeploy via Netlify. Changes take effect        ║
+// ║  immediately on next page load.                                      ║
+// ║  Reference: CPC_Rules_Reference.xlsx (keep in sync with this block) ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+
+// ── R1: Plan ID Lookup ───────────────────────────────────────────────────
+// Output col Q (MAIN_OFFER_ID) and col R (MAIN_OFFER_NAME)
+// Applies to: USM + UPL
+// To add a plan: "Plan Name": "PlanID"
+// To change a plan ID: update the value on the right
 const PLAN_ID_MAP = {
-  "U Postpaid Borneo 68":"225625","U Postpaid 98":"209318",
-  "U Postpaid 68":"222916","U Family 128":"255139",
-  "U Biz Share 128":"269227","U Biz 98":"209324","U Biz 68":"223130",
+  "Ultra Postpaid 68":      "293548",
+  "Ultra Postpaid Borneo 68":"293580",
+  "ULTRA Global 98":        "293564",
+  "ULTRA Family 128":       "255139",
 };
-const RRP_TIERS = [
-  [8000,Infinity,"T1"],[6000,8000,"T2"],[5000,6000,"T3"],
-  [4000,5000,"T4"],[3000,4000,"T5"],[1300,3000,"T6"],[0,1300,"T7"],
+
+// ── R2: RRP Tier Thresholds ──────────────────────────────────────────────
+// Output col BW (CUST_GROUP) — UPL / Instalment only; Upfront always blank
+// Format: [minimum RRP (inclusive), "Tier label"]
+// Tiers are evaluated top-down; first match wins
+// Anything ≥ RM8,000 (including above RM10,000) → Tier 1
+// To add a new tier: insert a new row in the correct descending order
+const RRP_TIER_THRESHOLDS = [
+  [8000, "Tier 1"],
+  [6000, "Tier 2"],
+  [5000, "Tier 3"],
+  [4000, "Tier 4"],
+  [3000, "Tier 5"],
+  [1300, "Tier 6"],
+  [0,    "Tier 7"],
 ];
+// Full T8 stack — used when CUST Group override = T8
+const ALL_TIERS_T8 = ["Tier 1","Tier 2","Tier 3","Tier 4","Tier 5","Tier 6","Tier 7","Tier 8"];
+
+// ── R3: Agreement Group ──────────────────────────────────────────────────
+// Output col CA (AGREEMENT_GROUP)
+// Applies to: USM (Upfront) + UPL (Instalment)
+// Key must match Agreement Tag exactly (case-sensitive)
 const AGREEMENT_GROUP_MAP = {
-  "Upfront":"Tier All|Contract Phone Full Group|Tier 8 Cap",
-  "Instalment":"Tier 1 Instalment|Tier 2 Instalment|Tier 3 Instalment|Tier 4 Instalment|Tier 5 Instalment|Tier 6 Instalment|Tier 7 Instalment|Tier 8 Instalment|Tier All|Contract Phone Full Group|Bogota and Normal Group|Tier 8 Cap",
+  "Upfront":    "Tier All|Contract Phone Full Group|Tier 8 Cap",
+  "No Upfront": "Tier 1 No Upfront|Tier 2 No Upfront|Tier 3 No Upfront|Tier 4 No Upfront|Tier 5 No Upfront|Tier 6 No Upfront|Tier 7 No Upfront|Tier 8 No Upfront|Tier All|Contract Phone Full Group|Tier 8 Cap",
+  "Instalment": "Tier 1 Instalment|Tier 2 Instalment|Tier 3 Instalment|Tier 4 Instalment|Tier 5 Instalment|Tier 6 Instalment|Tier 7 Instalment|Tier 8 Instalment|Tier All|Contract Phone Full Group|Bogota and Normal Group|Tier 8 Cap",
 };
+
+// ── R8: Agreement Fee AIT ────────────────────────────────────────────────
+// Output cols CE–CF (DEV_AGREEMENT_FEE_AIT_ID, DEV_AGREEMENT_FEE_AIT_NAME)
+// Applies to: USM only — Combo 2/4/6 (No Upfront) → cols CE & CF BLANK
+// Col CG (DEV_AGREEMENT_FEE amount) always drawn from input file — not here
+// Combo 5 has different AIT ID (13306) — wired up when Combo 5 is built
+// out[82] = AIT_ID, out[83] = AIT_NAME (set in transformRow per combo)
+
+// ── R9: Upfront Rebate Lookup ────────────────────────────────────────────
+// Output cols CH–CK (UPFRONT_REBATE_PLAN_ID, NAME, MONTHS, TOTAL)
+// Applies to: USM (Upfront) only — Combo 1–4
+// ⚠  IMPORTANT: When building Combo 5 & 6 (Dealer Prihatin Plus), a SEPARATE
+//    rebate map will be needed — remind Jack to provide that list at that time.
+// Key = "upfrontAmount|tenureMonths" — needed because same amount can exist
+// across different tenures (e.g. RM864 in 24M and 36M have different plan IDs)
 const UPFRONT_REBATE_MAP = {
-  360:["11050","RM360 (RM15 x 24 months)","24","360"],
-  408:["10692","RM408 (RM17 x 24 months)","24","408"],
-  480:["10575","RM480 (RM20 x 24 months)","24","480"],
-  504:["10576","RM504 (RM21 x 24 months)","24","504"],
-  528:["11051","RM528 (RM22 x 24 months)","24","528"],
-  600:["10693","RM600 (RM25 x 24 months)","24","600"],
-  648:["11052","RM648 (RM27 x 24 months)","24","648"],
-  720:["10305","RM720 (RM30 x 24 months)","24","720"],
-  768:["10990","RM768 (RM32 x 24 months)","24","768"],
-  864:["10574","RM864 (RM36 x 24 months)","24","864"],
-  888:["10970","RM888 (RM37 x 24 months)","24","888"],
-  936:["10579","RM936 (RM39 x 24 months)","24","936"],
-  984:["11054","RM984 (RM41 x 24 months)","24","984"],
-  1200:["11055","RM1200 (RM50 x 24 months)","24","1200"],
+  // 6-month rebates
+  "180|6":  ["10832","RM180 (RM30 x 6 months)","6","180"],
+  "240|6":  ["10930","RM240 (RM40 x 6 months)","6","240"],
+  // 12-month rebates
+  "204|12": ["10690","RM204 (RM17 x 12 months)","12","204"],
+  "300|12": ["10691","RM300 (RM25 x 12 months)","12","300"],
+  // 24-month rebates
+  "360|24": ["11050","RM360 (RM15 x 24 months)","24","360"],
+  "384|24": ["10572","RM384 (RM16 x 24 months)","24","384"],
+  "408|24": ["10692","RM408 (RM17 x 24 months)","24","408"],
+  "432|24": ["11270","RM432 (RM18 x 24 months)","24","432"],
+  "456|24": ["11271","RM456 (RM19 x 24 months)","24","456"],
+  "480|24": ["10575","RM480 (RM20 x 24 months)","24","480"],
+  "504|24": ["10576","RM504 (RM21 x 24 months)","24","504"],
+  "528|24": ["11051","RM528 (RM22 x 24 months)","24","528"],
+  "552|24": ["11272","RM552 (RM23 x 24 months)","24","552"],
+  "576|24": ["10573","RM576 (RM24 x 24 months)","24","576"],
+  "600|24": ["10693","RM600 (RM25 x 24 months)","24","600"],
+  "624|24": ["11312","RM624 (RM26 x 24 months)","24","624"],
+  "648|24": ["11052","RM648 (RM27 x 24 months)","24","648"],
+  "672|24": ["10577","RM672 (RM28 x 24 months)","24","672"],
+  "696|24": ["11277","RM696 (RM29 x 24 months)","24","696"],
+  "720|24": ["10305","RM720 (RM30 x 24 months)","24","720"],
+  "744|24": ["11278","RM744 (RM31 x 24 months)","24","744"],
+  "768|24": ["10990","RM768 (RM32 x 24 months)","24","768"],
+  "792|24": ["10580","RM792 (RM33 x 24 months)","24","792"],
+  "816|24": ["10651","RM816 (RM34 x 24 months)","24","816"],
+  "840|24": ["11315","RM840 (RM35 x 24 months)","24","840"],
+  "864|24": ["10574","RM864 (RM36 x 24 months)","24","864"],
+  "888|24": ["10970","RM888 (RM37 x 24 months)","24","888"],
+  "912|24": ["11284","RM912 (RM38 x 24 months)","24","912"],
+  "936|24": ["10579","RM936 (RM39 x 24 months)","24","936"],
+  "960|24": ["11285","RM960 (RM40 x 24 months)","24","960"],
+  "984|24": ["11054","RM984 (RM41 x 24 months)","24","984"],
+  "1032|24":["10306","RM1032 (RM43 x 24 months)","24","1032"],
+  "1056|24":["10571","RM1056 (RM44 x 24 months)","24","1056"],
+  "1080|24":["11286","RM1080 (RM45 x 24 months)","24","1080"],
+  "1128|24":["10578","RM1128 (RM47 x 24 months)","24","1128"],
+  "1200|24":["11055","RM1200 (RM50 x 24 months)","24","1200"],
+  // 36-month rebates
+  "540|36": ["11273","RM540 (RM15 x 36 months)","36","540"],
+  "576|36": ["11274","RM576 (RM16 x 36 months)","36","576"],
+  "612|36": ["10772","RM612 (RM17 x 36 months)","36","612"],
+  "648|36": ["11275","RM648 (RM18 x 36 months)","36","648"],
+  "684|36": ["11276","RM684 (RM19 x 36 months)","36","684"],
+  "756|36": ["11030","RM756 (RM21 x 36 months)","36","756"],
+  "792|36": ["11310","RM792 (RM22 x 36 months)","36","792"],
+  "828|36": ["11090","RM828 (RM23 x 36 months)","36","828"],
+  "864|36": ["11311","RM864 (RM24 x 36 months)","36","864"],
+  "900|36": ["10770","RM900 (RM25 x 36 months)","36","900"],
+  "936|36": ["11313","RM936 (RM26 x 36 months)","36","936"],
+  "972|36": ["11279","RM972 (RM27 x 36 months)","36","972"],
+  "1008|36":["11280","RM1008 (RM28 x 36 months)","36","1008"],
+  "1044|36":["11281","RM1044 (RM29 x 36 months)","36","1044"],
+  "1080|36":["10771","RM1080 (RM30 x 36 months)","36","1080"],
+  "1116|36":["11282","RM1116 (RM31 x 36 months)","36","1116"],
+  "1152|36":["11314","RM1152 (RM32 x 36 months)","36","1152"],
+  "1188|36":["11283","RM1188 (RM33 x 36 months)","36","1188"],
+  "1224|36":["11316","RM1224 (RM34 x 36 months)","36","1224"],
+  "1260|36":["11317","RM1260 (RM35 x 36 months)","36","1260"],
+  "1296|36":["11318","RM1296 (RM36 x 36 months)","36","1296"],
+  "1332|36":["11053","RM1332 (RM37 x 36 months)","36","1332"],
+  "1368|36":["11287","RM1368 (RM38 x 36 months)","36","1368"],
+  "1404|36":["11031","RM1404 (RM39 x 36 months)","36","1404"],
+  "1440|36":["11288","RM1440 (RM40 x 36 months)","36","1440"],
+  "1476|36":["11289","RM1476 (RM41 x 36 months)","36","1476"],
+  "1548|36":["11290","RM1548 (RM43 x 36 months)","36","1548"],
+  "1584|36":["11291","RM1584 (RM44 x 36 months)","36","1584"],
+  "1620|36":["11292","RM1620 (RM45 x 36 months)","36","1620"],
+  "1692|36":["11293","RM1692 (RM47 x 36 months)","36","1692"],
+  "1800|36":["10971","RM1800 (RM50 x 36 months)","36","1800"],
 };
+
+// ── R9b: Upfront Rebate Lookup — Dealer Prihatin Plus (Combo 5 only) ────
+// Output cols CH–CK — same columns, different plan IDs from standard map
+// Applies to: USM Combo 5 (Consignment Dealers + Upfront) only
+// Combo 6 (Consignment Dealers + No Upfront) → cols CH–CK left BLANK
+// Key = "upfrontAmount|tenureMonths" (same structure as UPFRONT_REBATE_MAP)
+const UPFRONT_REBATE_PRIHATIN_MAP = {
+  // 6-month
+  "180|6":  ["10833","RM180 (RM30 x 6 months) Prihatin","6","180"],
+  "240|6":  ["10931","RM240 (RM40 x 6 months) Prihatin","6","240"],
+  // 12-month
+  "204|12": ["10694","RM204 (RM17 x 12 months) Prihatin","12","204"],
+  "300|12": ["10695","RM300 (RM25 x 12 months) Prihatin","12","300"],
+  // 24-month
+  "360|24": ["11070","RM360 (RM15 x 24 months) Prihatin","24","360"],
+  "384|24": ["11319","RM384 (RM16 x 24 months) Prihatin","24","384"],
+  "408|24": ["10696","RM408 (RM17 x 24 months) Prihatin","24","408"],
+  "432|24": ["11320","RM432 (RM18 x 24 months) Prihatin","24","432"],
+  "456|24": ["11321","RM456 (RM19 x 24 months) Prihatin","24","456"],
+  "480|24": ["11252","RM480 (RM20 x 24 months) Prihatin","24","480"],
+  "504|24": ["11251","RM504 (RM21 x 24 months) Prihatin","24","504"],
+  "528|24": ["11071","RM528 (RM22 x 24 months) Prihatin","24","528"],
+  "552|24": ["11322","RM552 (RM23 x 24 months) Prihatin","24","552"],
+  "576|24": ["11323","RM576 (RM24 x 24 months) Prihatin","24","576"],
+  "600|24": ["10697","RM600 (RM25 x 24 months) Prihatin","24","600"],
+  "624|24": ["11331","RM624 (RM26 x 24 months) Prihatin","24","624"],
+  "648|24": ["11072","RM648 (RM27 x 24 months) Prihatin","24","648"],
+  "672|24": ["11332","RM672 (RM28 x 24 months) Prihatin","24","672"],
+  "696|24": ["11333","RM696 (RM29 x 24 months) Prihatin","24","696"],
+  "720|24": ["11250","RM720 (RM30 x 24 months) Prihatin","24","720"],
+  "744|24": ["11334","RM744 (RM31 x 24 months) Prihatin","24","744"],
+  "768|24": ["10992","RM768 (RM32 x 24 months) Prihatin","24","768"],
+  "792|24": ["11335","RM792 (RM33 x 24 months) Prihatin","24","792"],
+  "816|24": ["11343","RM816 (RM34 x 24 months) Prihatin","24","816"],
+  "840|24": ["11344","RM840 (RM35 x 24 months) Prihatin","24","840"],
+  "864|24": ["11077","RM864 (RM36 x 24 months) Prihatin","24","864"],
+  "888|24": ["11073","RM888 (RM37 x 24 months) Prihatin","24","888"],
+  "912|24": ["11345","RM912 (RM38 x 24 months) Prihatin","24","912"],
+  "936|24": ["11253","RM936 (RM39 x 24 months) Prihatin","24","936"],
+  "960|24": ["11346","RM960 (RM40 x 24 months) Prihatin","24","960"],
+  "984|24": ["11075","RM984 (RM41 x 24 months) Prihatin","24","984"],
+  "1032|24":["11347","RM1032 (RM43 x 24 months) Prihatin","24","1032"],
+  "1056|24":["11348","RM1056 (RM44 x 24 months) Prihatin","24","1056"],
+  "1080|24":["11349","RM1080 (RM45 x 24 months) Prihatin","24","1080"],
+  "1128|24":["11350","RM1128 (RM47 x 24 months) Prihatin","24","1128"],
+  "1200|24":["11076","RM1200 (RM50 x 24 months) Prihatin","24","1200"],
+  // 36-month
+  "540|36": ["11324","RM540 (RM15 x 36 months) Prihatin","36","540"],
+  "576|36": ["11325","RM576 (RM16 x 36 months) Prihatin","36","576"],
+  "612|36": ["10774","RM612 (RM17 x 36 months) Prihatin","36","612"],
+  "648|36": ["11326","RM648 (RM18 x 36 months) Prihatin","36","648"],
+  "684|36": ["11327","RM684 (RM19 x 36 months) Prihatin","36","684"],
+  "720|36": ["11328","RM720 (RM20 x 36 months) Prihatin","36","720"],
+  "756|36": ["11255","RM756 (RM21 x 36 months) Prihatin","36","756"],
+  "792|36": ["11329","RM792 (RM22 x 36 months) Prihatin","36","792"],
+  "828|36": ["11091","RM828 (RM23 x 36 months) Prihatin","36","828"],
+  "864|36": ["11330","RM864 (RM24 x 36 months) Prihatin","36","864"],
+  "900|36": ["10775","RM900 (RM25 x 36 months) Prihatin","36","900"],
+  "936|36": ["11336","RM936 (RM26 x 36 months) Prihatin","36","936"],
+  "972|36": ["11337","RM972 (RM27 x 36 months) Prihatin","36","972"],
+  "1008|36":["11338","RM1008 (RM28 x 36 months) Prihatin","36","1008"],
+  "1044|36":["11339","RM1044 (RM29 x 36 months) Prihatin","36","1044"],
+  "1080|36":["11254","RM1080 (RM30 x 36 months) Prihatin","36","1080"],
+  "1116|36":["11340","RM1116 (RM31 x 36 months) Prihatin","36","1116"],
+  "1152|36":["11341","RM1152 (RM32 x 36 months) Prihatin","36","1152"],
+  "1188|36":["11342","RM1188 (RM33 x 36 months) Prihatin","36","1188"],
+  "1224|36":["11351","RM1224 (RM34 x 36 months) Prihatin","36","1224"],
+  "1260|36":["11352","RM1260 (RM35 x 36 months) Prihatin","36","1260"],
+  "1296|36":["11353","RM1296 (RM36 x 36 months) Prihatin","36","1296"],
+  "1332|36":["11074","RM1332 (RM37 x 36 months) Prihatin","36","1332"],
+  "1368|36":["11354","RM1368 (RM38 x 36 months) Prihatin","36","1368"],
+  "1404|36":["11256","RM1404 (RM39 x 36 months) Prihatin","36","1404"],
+  "1440|36":["11355","RM1440 (RM40 x 36 months) Prihatin","36","1440"],
+  "1476|36":["11356","RM1476 (RM41 x 36 months) Prihatin","36","1476"],
+  "1548|36":["11357","RM1548 (RM43 x 36 months) Prihatin","36","1548"],
+  "1584|36":["11358","RM1584 (RM44 x 36 months) Prihatin","36","1584"],
+  "1620|36":["11359","RM1620 (RM45 x 36 months) Prihatin","36","1620"],
+  "1692|36":["11360","RM1692 (RM47 x 36 months) Prihatin","36","1692"],
+  "1800|36":["11230","RM1800 (RM50 x 36 months) Prihatin","36","1800"],
+};
+// Output cols CL–CM (INSTALMENT_PLAN_ID, INSTALMENT_PLAN_NAME)
+// Applies to: UPL (Instalment) only
+// Key = "phonetype|tenure" (phonetype: "iphone" or "android", tenure in months)
+// Note: Android 48M does not currently exist — do not add until confirmed
 const INSTALMENT_PLAN_MAP = {
-  "android|24":["10935","Android UPL Average Percent 24M - 1M charge"],
-  "android|36":["10950","Android UPL Average Percent 36M - 1M charge"],
-  "iphone|24": ["10932","iPhone UPL Average Percent 24M - 1M charge"],
-  "iphone|36": ["10933","iPhone UPL Average Percent 36M - 1M charge"],
-  "iphone|48": ["10934","iPhone UPL Average Percent 48M - 1M charge"],
+  "android|24": ["10935", "Android UPL Average Percent 24M - 1M charge"],
+  "android|36": ["10950", "Android UPL Average Percent 36M - 1M charge"],
+  "iphone|24":  ["10932", "iPhone UPL Average Percent 24M - 1M charge"],
+  "iphone|36":  ["10933", "iPhone UPL Average Percent 36M - 1M charge"],
+  "iphone|48":  ["10934", "iPhone UPL Average Percent 48M - 1M charge"],
 };
+
+// ── R6: Handset Fee AIT ──────────────────────────────────────────────────
+// Output cols CB–CC (DEV_HANDSET_FEE_AIT_ID, DEV_HANDSET_FEE_AIT_NAME)
+// Applies to: UPL (Instalment) only
+// USM (Upfront) always uses 10700 / Device Retail Fee (hardcoded, not here)
+// Key = normalised phone group ("iphone" or "android")
 const HANDSET_FEE_AIT_MAP = {
-  "iphone":["12353","iPhone Installment Fee"],
-  "android":["13422","Android Installment Fee"],
+  "iphone":  ["12353", "iPhone Installment Fee"],
+  "android": ["13422", "Android Installment Fee"],
 };
+
+// ── R7: ETP Rules ────────────────────────────────────────────────────────
+// Output col DL (DEV_ETP_RULE), cols DN–DO (DEV_ETP_TPL_ID, DEV_ETP_PTPL_ID)
+// The {deviceFee} and {tenure} placeholders are replaced at runtime per row
+// Applies to: USM (Upfront) and UPL (Instalment) — different formula per tag
+const ETP_RULES = {
+  "Upfront": {
+    rule:   "getPriceDifference(Offer Instance Feature,EXP_RRP,{deviceFee})/{tenure}*getAgreementRemainBillingMonth(Offer Instance Information))-getRemainRebate(Offer Instance Information))",
+    tpl_id: "101003",
+  },
+  "No Upfront": {
+    rule:   "getPriceDifference(Offer Instance Feature,EXP_RRP,{deviceFee})/{tenure}*getAgreementRemainBillingMonth(Offer Instance Information))",
+    tpl_id: "101004",
+  },
+  "Instalment": {
+    rule:   "getPriceDifference(Offer Instance Feature,EXP_RRP,{deviceFee})/{tenure}*getAgreementRemainBillingMonth(Offer Instance Information))",
+    tpl_id: "101004",
+  },
+};
+
+// ── R8: Sales Org Code ───────────────────────────────────────────────────
+// Output col BT (SALES_ORG_CODE)
+// Keyed by Consignment type — only Consignment (Others) has a value
+// Combo 3 & 4 (Consignment Others): pipe-separated org code list
+// All other combos (Non Consignment, Consignment Dealers, UPL): BLANK
+const SALES_ORG_CODE_MAP = {
+  "Consignment (Others)": "CS_BOP_SC_1U|CS_BOP_SC_AU2|CS_BOP_SC_BKT|CS_BOP_SC_BTSX|CS_BOP_SC_IPH|CS_BOP_SC_JTM|CS_BOP_SC_MLK|CS_BOP_SC_QBM|CS_BOP_SC_SBJ|CS_BOP_SC_SBN|CS_BOP_SC_IMG|CS_BOP_SC_VCM|CS_BOP_SC_KKS|CS_BOP_SC_BMM|CS_BOP_SC_TSB|CS_BOP_SC_MKT|CS_BOP_SC_ECM|CS_BOP_SC_KBM|CS_BOP_SC_SPEX|CS_BOP_SC_IOI|CS_BOP_SC_IMP|CS_BOP_SC_SMP|CS_BOP_SC_IMD|CS_BOP_SC_SWP|CS_BOP_SC_PBJ|CS_BOP_SC_SWS|CS_BOP_SC_UPT|CS_BOP_SC_BV2|CS_BOP_SC_TM2|CS_BOP_SC_BRP|CS_BOP_SC_TDI|CS_BOP_SC_BMK|CS_BOP_SC_KJM|CS_BOP_SC_ASP|TEST_CS_BOP|TEST_CS_BOP_SC|TEST_MKT|TEST_MKT_BRANCH|MKT_DCS_ESHOP|TEST_ESHOP_BRANCH|TEST_ESHOP|MKT_Base Mktg_Telesales",
+};
+
+// ── R2: Brand List ───────────────────────────────────────────────────────
+// Used for: Brand dropdown (Single Record form) + validation (Bulk Upload)
+// To add a brand: add a new string to the array (UPPERCASE, no trailing spaces)
+// To remove: delete the entry
+// Update app RULES block (BRAND_LIST) — ref: R2_Brand
+const BRAND_LIST = [
+  "APPLE","GOOGLE","SAMSUNG","HONOR","HUAWEI",
+  "NOTHING","OPPO","REALME","VIVO","XIAOMI","ZTE",
+];
+
+// ── R3: Storage List ────────────────────────────────────────────────────
+// Universal across all brands and phone groups
+// To add a new storage option: add a new string to the array
+// Update app RULES block (STORAGE_LIST) — ref: R3_Storage
+const STORAGE_LIST = [
+  "4+64GB","4+128GB","4+256GB",
+  "6+64GB","6+128GB","6+256GB","6+512GB",
+  "8+128GB","8+256GB","8+512GB","8+1TB","8+2TB",
+  "12+128GB","12+256GB","12+512GB","12+1TB","12+2TB",
+  "16+256GB","16+512GB","16+1TB","16+2TB",
+  "128GB","256GB","512GB","1TB","2TB",
+  "S/M","M/L",
+];
+
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END OF RULES BLOCK                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 const CHANNELS = ["Business Customer Care","CRM","Eshop","MCCM","UMREX","UCC"];
 const COL_HEADERS = [
   "AGREEMENT_ID","AGREEMENT_NAME","AGREEMENT_STATE","AGREEMENT_PERIOD","AGREEMENT_TYPE_NAME",
@@ -876,7 +1278,9 @@ const GROUP_HEADERS = {
 // ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
-let currentMode = "Upfront";
+let currentMode = "Upfront";       // "Upfront" or "Instalment" — drives transform logic
+let usmConsignment = "Non Consignment"; // USM sub-selection 1
+let usmUpfront     = "Upfront";         // USM sub-selection 2
 let queue = [];
 let bulkData = [];
 
@@ -885,8 +1289,20 @@ let bulkData = [];
 // ═══════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
   buildChannelGrid();
+  buildDropdown("brand",   BRAND_LIST);
+  buildDropdown("storage", STORAGE_LIST);
+  updateUSMSub();
   updateModeUI();
 });
+
+function buildDropdown(id, list) {
+  const sel = document.getElementById(id);
+  list.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
+}
 
 function buildChannelGrid() {
   const grid = document.getElementById("channelGrid");
@@ -925,26 +1341,107 @@ function switchTab(tab) {
 // ═══════════════════════════════════════════════
 function selectMode(mode) {
   currentMode = mode;
-  document.getElementById("modeUpfront").classList.toggle("selected", mode === "Upfront");
-  document.getElementById("modeInstalment").classList.toggle("selected", mode === "Instalment");
+  document.getElementById("modeUSM").classList.toggle("selected", mode === "Upfront");
+  document.getElementById("modeUPL").classList.toggle("selected", mode === "Instalment");
   updateModeUI();
 }
 
+// Combo → Agreement Tag default mapping
+const COMBO_TAG_MAP = {
+  "Non Consignment|Upfront":        "Upfront",
+  "Non Consignment|No Upfront":     "No Upfront",
+  "Consignment (Others)|Upfront":   "Upfront",
+  "Consignment (Others)|No Upfront":"No Upfront",
+  "Consignment (Dealers)|Upfront":  "Dealer Prihatin Plus",
+  "Consignment (Dealers)|No Upfront":"Dealer Prihatin Plus",
+};
+
+function updateUSMSub() {
+  usmConsignment = document.getElementById("usmConsignment").value;
+  usmUpfront     = document.getElementById("usmUpfront").value;
+
+  // Auto-derive and set Agreement Tag based on combo
+  const comboKey = `${usmConsignment}|${usmUpfront}`;
+  const derivedTag = COMBO_TAG_MAP[comboKey] || "Upfront";
+  const tagSel = document.getElementById("usmAgreementTag");
+  tagSel.value = derivedTag;
+
+  updateSidebarLabel();
+}
+
+function updateSidebarLabel() {
+  const el = document.getElementById("sidebarUSMLabel");
+  if (!el) return;
+  if (currentMode === "Upfront") {
+    el.textContent = `USM · ${usmConsignment} · ${usmUpfront}`;
+  } else {
+    el.textContent = "USM · One-Off";
+  }
+}
+
 function updateModeUI() {
-  const inst = currentMode === "Instalment";
-  const inp  = document.getElementById("upfrontPayment");
-  inp.disabled = inst;
-  if (inst) {
-    inp.value = "";
-    inp.classList.remove("err");
+  const isUSM  = currentMode === "Upfront";
+  const isUPL  = currentMode === "Instalment";
+
+  // Show/hide USM sub-selections
+  const usmSub = document.getElementById("usmSubRow");
+  if (usmSub) usmSub.style.display = isUSM ? "" : "none";
+
+  // Upfront Payment field — only active for USM Upfront combos
+  const showUpfront = isUSM && usmUpfront === "Upfront";
+  const inpUp = document.getElementById("upfrontPayment");
+  inpUp.disabled = !showUpfront;
+  if (!showUpfront) {
+    inpUp.value = "";
+    inpUp.classList.remove("err");
     document.getElementById("upfrontReq").style.display = "none";
-    document.getElementById("upfrontHint").textContent = "Not applicable for Instalment";
+    document.getElementById("upfrontHint").textContent = isUPL ? "Not applicable for Instalment" : "Not applicable for No Upfront";
     document.getElementById("upfrontGroup").style.opacity = "0.5";
   } else {
     document.getElementById("upfrontReq").style.display = "";
     document.getElementById("upfrontHint").textContent = "";
     document.getElementById("upfrontGroup").style.opacity = "1";
   }
+
+  // Rebate Tenure field — only active for USM Upfront combos (same visibility as Upfront Payment)
+  const inpRebateTenure = document.getElementById("rebateTenure");
+  inpRebateTenure.disabled = !showUpfront;
+  if (!showUpfront) {
+    inpRebateTenure.value = "";
+    inpRebateTenure.classList.remove("err");
+    document.getElementById("rebateTenureReq").style.display = "none";
+    document.getElementById("rebateTenureHint").textContent = isUPL ? "Not applicable for Instalment" : "Not applicable for No Upfront";
+    document.getElementById("rebateTenureGroup").style.opacity = "0.5";
+  } else {
+    document.getElementById("rebateTenureReq").style.display = "";
+    document.getElementById("rebateTenureHint").textContent = "";
+    document.getElementById("rebateTenureGroup").style.opacity = "1";
+  }
+
+  // No Upfront Payment field — only active for USM No Upfront combos
+  const showNoUpfront = isUSM && usmUpfront === "No Upfront";
+  const inpNoUp = document.getElementById("noUpfrontPayment");
+  inpNoUp.disabled = !showNoUpfront;
+  if (!showNoUpfront) {
+    inpNoUp.value = "";
+    inpNoUp.classList.remove("err");
+    document.getElementById("noUpfrontReq").style.display = "none";
+    document.getElementById("noUpfrontHint").textContent = isUPL ? "Not applicable for Instalment" : "Not applicable for Upfront";
+    document.getElementById("noUpfrontGroup").style.opacity = "0.5";
+  } else {
+    document.getElementById("noUpfrontReq").style.display = "";
+    document.getElementById("noUpfrontHint").textContent = "";
+    document.getElementById("noUpfrontGroup").style.opacity = "1";
+  }
+
+  // T8 toggle: only visible for UPL Instalment
+  const t8Row = document.getElementById("t8OverrideRow");
+  if (t8Row) {
+    t8Row.style.display = isUPL ? "" : "none";
+    if (!isUPL) document.getElementById("t8Override").checked = false;
+  }
+
+  updateSidebarLabel();
 }
 
 // ═══════════════════════════════════════════════
@@ -957,11 +1454,19 @@ function normPG(pg) {
   return (s.includes("iphone")||s.includes("apple")) ? "iphone" : "android";
 }
 
-function getRrpTier(v) {
-  v = parseFloat(v);
+// Returns stacked tier string e.g. "Tier 1|Tier 2|Tier 3" for RRP 5500
+// Pass t8Override=true to return full T1–T8 stack
+function getCustGroup(rrp, t8Override) {
+  if (t8Override) return ALL_TIERS_T8.join("|");
+  const v = parseFloat(rrp);
   if (isNaN(v)) return "";
-  for (const [lo,hi,t] of RRP_TIERS) if (v>=lo && v<hi) return t;
-  return "T7";
+  let lowestTierIdx = 0; // default T1
+  for (let i = 0; i < RRP_TIER_THRESHOLDS.length; i++) {
+    if (v >= RRP_TIER_THRESHOLDS[i][0]) { lowestTierIdx = i; break; }
+    lowestTierIdx = i; // keep walking down
+  }
+  // Collect T1 through the derived tier
+  return RRP_TIER_THRESHOLDS.slice(0, lowestTierIdx + 1).map(t => t[1]).join("|");
 }
 
 function sortCh(str) {
@@ -1021,14 +1526,18 @@ function transformRow(r) {
   const model     = g("Model");
   const color     = g("Color");
   const storage   = g("Storage");
-  const plan      = g("Plan");
-  const tag       = g("Agreement Tag");
-  const tenure    = g("Tenure");
+  const plan        = g("Plan");
+  const consignment = g("Consignment");
+  const upfrontCol  = g("Upfront");           // col J — decides "With Upfront" vs "No Upfront" in Agreement Name
+  const tag         = g("Agreement Tag");     // col K — derived by Excel formula in template from H × J combo
+  const tenure      = g("Tenure");
   const pg        = g("Phone Group");
   const sku       = g("SKU code");
   const rrpRaw    = r["RRP"];
   const devFeeRaw = r["Device Fee"];
-  const upfrontRaw= r["Upfront Payment"];
+  const upfrontRaw    = r["Upfront Payment"];
+  const rebateTenure  = String(r["Rebate Tenure"] || "").trim();
+  const noUpfrontRaw  = r["No Upfront Payment"];
   const salesCh   = g("Sales Channel");
   const effDate   = r["Effective Date"];
   const effTime   = r["Effective Time"];
@@ -1036,22 +1545,38 @@ function transformRow(r) {
   const expTime   = r["Expiry Time"];
 
   const effStr = fmtDate(effDate, effTime) || "";
-  const expStr = fmtDate(expDate, expTime) || "2099-12-31 00:00:00";
+  const expStr = fmtDate(expDate, expTime) || "2099-12-31 23:59:59";
   const rrpFmt = fmtMoney(rrpRaw);
   const devFmt = fmtMoney(devFeeRaw);
   const pgn    = normPG(pg);
+  const custGroupOverride = g("CUST Group").toUpperCase() === "T8";
 
   if (!rrpFmt)  errors.push("RRP is missing or invalid");
   if (!devFmt)  errors.push("Device Fee is missing or invalid");
   if (!effStr)  errors.push("Effective Date is missing or invalid");
 
+  if (!brand) {
+    errors.push("Brand is missing");
+  } else if (!BRAND_LIST.includes(brand.toUpperCase().trim())) {
+    errors.push(`Brand "${brand}" is not in the approved list — check R2 in CPC_Rules_Reference`);
+  }
+  if (!storage) {
+    errors.push("Storage is missing");
+  } else if (!STORAGE_LIST.includes(storage.trim())) {
+    errors.push(`Storage "${storage}" is not in the approved list — check R3 in CPC_Rules_Reference`);
+  }
+
   const planId = PLAN_ID_MAP[plan] || "";
   if (!planId && plan) errors.push(`Plan "${plan}" not found in lookup table`);
 
-  const nameSuffix = {Upfront:"With Upfront",Instalment:"Installment"}[tag] || tag;
+  // Agreement Name suffix driven by col J (Upfront), not Agreement Tag
+  const nameSuffix = upfrontCol === "No Upfront" ? "No Upfront"
+                   : upfrontCol === "Upfront"    ? "With Upfront"
+                   : tag === "Instalment"         ? "Installment"
+                   : upfrontCol || tag;
 
   // ── Shared ────────────────────────────────────
-  out[1]   = `${brand} ${model} ${storage} ${color}(${plan} ${tenure}M ${nameSuffix})`;
+  out[1]   = `${brand} ${model} ${storage} ${color} (${plan} ${tenure}M ${nameSuffix})`;
   out[2]   = "Released";
   out[3]   = tenure;
   out[4]   = "Agreement Phone";
@@ -1068,36 +1593,125 @@ function transformRow(r) {
   out[24]  = sku;
   out[25]  = rrpFmt;
   out[69]  = sortCh(salesCh);
-  out[78]  = AGREEMENT_GROUP_MAP[tag] || "";
+  out[71]  = SALES_ORG_CODE_MAP[consignment] || "";  // Col BT — Consignment (Others) only
+  // Col CA — AGREEMENT_GROUP
+  // Combo 1–4: keyed directly by tag ("Upfront" or "No Upfront")
+  // Combo 5/6 (Dealer Prihatin Plus): tag doesn't exist in map — use upfrontCol instead
+  //   Combo 5 (Upfront)    → same CA as Combo 3 → AGREEMENT_GROUP_MAP["Upfront"]
+  //   Combo 6 (No Upfront) → same CA as Combo 4 → AGREEMENT_GROUP_MAP["No Upfront"]
+  const caKey = (tag === "Dealer Prihatin Plus") ? upfrontCol : tag;
+  out[78]  = AGREEMENT_GROUP_MAP[caKey] || "";
   out[113] = "12354";
   out[114] = "Device Early Termination Penalty";
   out[150] = "1";
 
-  // ── Upfront ───────────────────────────────────
-  if (tag === "Upfront") {
-    out[74]  = "";
-    out[79]  = "10700";
-    out[80]  = "Device Retail Fee";
-    out[81]  = devFmt;
-    out[82]  = "10701";
-    out[83]  = "Device Upfront Payment";
-    const upKey = Math.round(parseFloat(upfrontRaw));
-    if (!isNaN(upKey) && upKey > 0) {
-      out[84] = String(upKey);
-      const rb = UPFRONT_REBATE_MAP[upKey];
-      if (rb) { out[85]=rb[0]; out[86]=rb[1]; out[87]=rb[2]; out[88]=rb[3]; }
-      else errors.push(`Upfront Payment "${upKey}" not found in Rebate lookup table`);
-    } else {
-      errors.push("Upfront Payment is missing or invalid");
-    }
-    out[115] = `getPriceDifference(Offer Instance Feature,EXP_RRP,${devFmt})/24*getAgreementRemainBillingMonth(Offer Instance Information))-getRemainRebate(Offer Instance Information))`;
-    out[116] = `${devFmt}|${tenure}`;
-    out[117] = "101003"; out[118] = "101003";
-    out[125] = "FORFEIT";
+  // ── USM Upfront (Combo 1, 3, 5) & No Upfront (Combo 2, 4, 6) ──────────
+  // Combo 5/6 (Dealer Prihatin Plus) share the same Upfront/No Upfront axis as Combo 3/4
+  // upfrontCol (col J) is used to determine Upfront vs No Upfront for Combo 5/6
+  if (tag === "Upfront" || tag === "No Upfront" || tag === "Dealer Prihatin Plus") {
+    const isDealerPrihatin = (tag === "Dealer Prihatin Plus");
+    const isNoUpfront = isDealerPrihatin ? (upfrontCol === "No Upfront") : (tag === "No Upfront");
 
-  // ── Instalment ────────────────────────────────
+    // Col BW — CUST_GROUP
+    // Upfront (Combo 1/3/5): blank
+    // No Upfront (Combo 2/4/6): RRP-derived tier stack (T1 down to matching tier)
+    // Combo 5/6: upfrontCol drives isNoUpfront — replicates Combo 3 (blank) / Combo 4 (tier stack)
+    out[74] = isNoUpfront ? getCustGroup(rrpRaw, custGroupOverride) : "";
+
+    // Cols CB–CC — DEV_HANDSET_FEE_AIT_ID / NAME
+    // Combo 1–4 (Non Consignment / Consignment Others): 10700 / Device Retail Fee
+    // Combo 5–6 (Consignment Dealers / Dealer Prihatin Plus): 13304 / Postpaid Device Retail Fee
+    if (isDealerPrihatin) {
+      out[79] = "13304";
+      out[80] = "Postpaid Device Retail Fee";
+    } else {
+      out[79] = "10700";
+      out[80] = "Device Retail Fee";
+    }
+    out[81] = devFmt;
+
+    // Cols CE–CF — DEV_AGREEMENT_FEE_AIT_ID / NAME
+    // Combo 1 & 3 (Non Consignment / Consignment Others, Upfront): 10701 / Device Upfront Payment
+    // Combo 5 (Consignment Dealers, Upfront): 13306 / Postpaid Device Upfront Payment
+    // Combo 2/4/6 (No Upfront): blank
+    if (!isNoUpfront) {
+      if (isDealerPrihatin) {
+        out[82] = "13306";
+        out[83] = "Postpaid Device Upfront Payment";
+      } else {
+        out[82] = "10701";
+        out[83] = "Device Upfront Payment";
+      }
+    }
+
+    if (!isNoUpfront) {
+      // ── Combo 1 / 3 / 5 (Upfront) — CG onwards ───────────────────────
+
+      // Col CG — DEV_AGREEMENT_FEE: drawn from input Upfront Payment column for all Upfront combos
+      // out[84] = upfront amount (set alongside CH–CK block below)
+
+      // Cols CH–CK — Upfront Rebate
+      // Combo 1 & 3 (Non Consignment / Consignment Others): UPFRONT_REBATE_MAP (Standard)
+      // Combo 5 (Consignment Dealers / Dealer Prihatin Plus): UPFRONT_REBATE_PRIHATIN_MAP
+      const upKey = Math.round(parseFloat(upfrontRaw));
+      if (!isNaN(upKey) && upKey > 0) {
+        const rebateMap = (consignment === "Consignment (Dealers)")
+          ? UPFRONT_REBATE_PRIHATIN_MAP
+          : UPFRONT_REBATE_MAP;
+        out[84] = upKey.toFixed(2);  // Col CG always 2 decimal places
+        const rb = rebateMap[`${upKey}|${rebateTenure}`];
+        if (rb) { out[85]=rb[0]; out[86]=rb[1]; out[87]=rb[2]; out[88]=rb[3]; }
+        else errors.push(`No rebate found for Upfront Payment RM${upKey} with Rebate Tenure ${rebateTenure}M — check R9 in CPC_Rules_Reference`);
+      } else {
+        errors.push("Upfront Payment is missing or invalid");
+      }
+      if (!rebateTenure) errors.push("Rebate Tenure is missing — required for Upfront combos");
+
+      // Cols DJ–DO — Penalty Dev (ETP)
+      // Combo 1/3/5 (Upfront): Upfront formula with getRemainRebate, TPL/PTPL = 101003
+      // Combo 5 replicates Combo 3 — isNoUpfront=false routes here correctly via upfrontCol
+      out[115] = ETP_RULES["Upfront"].rule.replace("{deviceFee}", devFmt).replace("{tenure}", tenure);
+      out[116] = `${devFmt}|${tenure}`;
+      out[117] = ETP_RULES["Upfront"].tpl_id;
+      out[118] = ETP_RULES["Upfront"].tpl_id;
+
+      // Col DV — REMAIN_REBATE_OPER_TYPE
+      // Combo 1/3/5 (Upfront): FORFEIT — Combo 5 replicates Combo 3
+      out[125] = "FORFEIT";
+
+    } else {
+      // ── Combo 2 / 4 / 6 (No Upfront) — CG onwards ────────────────────
+
+      // Col CG — DEV_AGREEMENT_FEE: blank (no upfront payment for No Upfront combos)
+      // out[84] intentionally left null
+
+      // Cols CH–CK — Upfront Rebate: blank (no rebate applicable for No Upfront combos)
+      // out[85–88] intentionally left null
+
+      // Col DV — REMAIN_REBATE_OPER_TYPE: blank (no rebate to forfeit for No Upfront combos)
+      // Combo 2/4/6 (No Upfront): blank — Combo 6 replicates Combo 4
+      // out[125] intentionally left null
+
+      // Cols EI–EJ — Agreement Attribute (ATTR_CODE_A, ATTR_VALUE_A)
+      // Combo 2/4/6 (No Upfront): ETP_REBATE_AMOUNT_OF_NO_UPFRONT / No Upfront Payment amount
+      // Combo 6 replicates Combo 4 — isNoUpfront=true routes here correctly via upfrontCol
+      // Combo 5 (Upfront): blank — left null in Upfront branch above
+      out[138] = "ETP_REBATE_AMOUNT_OF_NO_UPFRONT";
+      out[139] = fmtMoney(noUpfrontRaw);
+      if (!out[139]) errors.push("No Upfront Payment is missing or invalid");
+
+      // Cols DJ–DO — Penalty Dev (ETP)
+      // Combo 2/4/6 (No Upfront): No Upfront formula (no getRemainRebate), TPL/PTPL = 101004
+      // Combo 6 replicates Combo 4 — isNoUpfront=true routes here correctly via upfrontCol
+      out[115] = ETP_RULES["No Upfront"].rule.replace("{deviceFee}", devFmt).replace("{tenure}", tenure);
+      out[116] = `${devFmt}|${tenure}`;
+      out[117] = ETP_RULES["No Upfront"].tpl_id;
+      out[118] = ETP_RULES["No Upfront"].tpl_id;
+    }
+
+  // ── Instalment (UPL) ──────────────────────────
   } else if (tag === "Instalment") {
-    out[74]  = getRrpTier(parseFloat(rrpRaw));
+    out[74]  = getCustGroup(rrpRaw, custGroupOverride);
     const ait = HANDSET_FEE_AIT_MAP[pgn] || HANDSET_FEE_AIT_MAP["android"];
     out[79]  = ait[0]; out[80] = ait[1]; out[81] = devFmt;
     const instKey = `${pgn}|${tenure}`;
@@ -1112,9 +1726,10 @@ function transformRow(r) {
     out[106] = "12052"; out[107] = "ETP-Device instalment";
     out[108] = "getRemainInstallmentFee(Product Instance ID))";
     out[110] = "100202"; out[111] = "100202"; out[112] = "CANCEL";
-    out[115] = `getPriceDifference(Offer Instance Feature,EXP_RRP,${devFmt})/24*getAgreementRemainBillingMonth(Offer Instance Information))`;
+    out[115] = ETP_RULES["Instalment"].rule.replace("{deviceFee}", devFmt).replace("{tenure}", tenure);
     out[116] = `${devFmt}|${tenure}`;
-    out[117] = "101004"; out[118] = "101004";
+    out[117] = ETP_RULES["Instalment"].tpl_id;
+    out[118] = ETP_RULES["Instalment"].tpl_id;
   } else {
     errors.push(`Agreement Tag "${tag}" is not supported yet`);
   }
@@ -1135,6 +1750,35 @@ function buildAndDownload(rows, allErrors) {
   rows.forEach(r => wsData.push(r.values));
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   ws["!cols"] = COL_HEADERS.map(h => ({ wch: Math.max(12, h.length+2) }));
+
+  // Merge group header cells in row 1 (0-indexed col ranges, row 0)
+  // Ranges based on: A-K, L-P, Q-AC, AD-BL, BM-BQ, BR-BV, BW-BZ,
+  //                  CA, CB-CG, CH-CK, CL-CN, CO-CV, CW-DB, DC-DI,
+  //                  DJ-DO, DP-DV, DW-EB, EC-EH, EI-ER, ES-ET, EU
+  ws["!merges"] = [
+    { s:{r:0,c:0},   e:{r:0,c:10}  }, // Base Information        A–K
+    { s:{r:0,c:11},  e:{r:0,c:15}  }, // Agreement Version       L–P
+    { s:{r:0,c:16},  e:{r:0,c:28}  }, // Agreement Object        Q–AC
+    { s:{r:0,c:29},  e:{r:0,c:63}  }, // Agreement Bonus         AD–BL
+    { s:{r:0,c:64},  e:{r:0,c:68}  }, // Agreement Maintainer    BM–BQ
+    { s:{r:0,c:69},  e:{r:0,c:73}  }, // Sales Authority         BR–BV
+    { s:{r:0,c:74},  e:{r:0,c:77}  }, // Purchase Qualification  BW–BZ
+    // CA (col 78) is a single cell — no merge needed
+    { s:{r:0,c:79},  e:{r:0,c:84}  }, // One Time Charge         CB–CG
+    { s:{r:0,c:85},  e:{r:0,c:88}  }, // Rebate Plan             CH–CK
+    { s:{r:0,c:89},  e:{r:0,c:91}  }, // Instalment Plan         CL–CN
+    { s:{r:0,c:92},  e:{r:0,c:99}  }, // Pre-charge              CO–CV
+    { s:{r:0,c:100}, e:{r:0,c:105} }, // Penalty Golden Number   CW–DB
+    { s:{r:0,c:106}, e:{r:0,c:112} }, // Penalty Dev Instalment  DC–DI
+    { s:{r:0,c:113}, e:{r:0,c:118} }, // Penalty Dev             DJ–DO
+    { s:{r:0,c:119}, e:{r:0,c:125} }, // Penalty Upfront Rebate  DP–DV
+    { s:{r:0,c:126}, e:{r:0,c:131} }, // Penalty Plan            DW–EB
+    { s:{r:0,c:132}, e:{r:0,c:137} }, // Penalty FBB             EC–EH
+    { s:{r:0,c:138}, e:{r:0,c:147} }, // Agreement Attribute     EI–ER
+    { s:{r:0,c:148}, e:{r:0,c:149} }, // Agreement Relationship  ES–ET
+    // EU (col 150) is a single cell — no merge needed
+  ];
+
   XLSX.utils.book_append_sheet(wb, ws, "Output");
   const ts = new Date().toISOString().replace(/[-:T]/g,"").slice(0,15);
   XLSX.writeFile(wb, `CPC_Output_${ts}.xlsx`);
@@ -1145,24 +1789,32 @@ function buildAndDownload(rows, allErrors) {
 // FORM ACTIONS
 // ═══════════════════════════════════════════════
 function collectFormData() {
+  const isUSM = currentMode === "Upfront";
   return {
-    "Phone Group":     document.getElementById("phoneGroup").value,
-    "Brand":           document.getElementById("brand").value.trim(),
-    "Model":           document.getElementById("model").value.trim(),
-    "Color":           document.getElementById("color").value.trim(),
-    "Storage":         document.getElementById("storage").value.trim(),
-    "Plan":            document.getElementById("plan").value,
-    "Agreement Tag":   currentMode,
-    "Tenure":          document.getElementById("tenure").value,
-    "SKU code":        document.getElementById("sku").value.trim(),
-    "RRP":             document.getElementById("rrp").value,
-    "Device Fee":      document.getElementById("deviceFee").value,
-    "Upfront Payment": document.getElementById("upfrontPayment").value,
-    "Sales Channel":   getSelectedChannels(),
-    "Effective Date":  document.getElementById("effDate").value,
-    "Effective Time":  document.getElementById("effTime").value,
-    "Expiry Date":     document.getElementById("expDate").value,
-    "Expiry Time":     document.getElementById("expTime").value,
+    "Phone Group":        document.getElementById("phoneGroup").value,
+    "Brand":              document.getElementById("brand").value.trim(),
+    "Model":              document.getElementById("model").value.trim(),
+    "Color":              document.getElementById("color").value.trim(),
+    "Storage":            document.getElementById("storage").value.trim(),
+    "Plan":               document.getElementById("plan").value,
+    "Agreement Type":     isUSM ? "USM" : "UPL",
+    "Consignment":        isUSM ? usmConsignment : "",
+    "Tenure":             document.getElementById("tenure").value,
+    "Upfront":            isUSM ? usmUpfront : "",
+    "Agreement Tag":      isUSM ? document.getElementById("usmAgreementTag").value : currentMode,
+    "Effective Date":     document.getElementById("effDate").value,
+    "Effective Time":     document.getElementById("effTime").value,
+    "Expiry Date":        document.getElementById("expDate").value,
+    "Expiry Time":        document.getElementById("expTime").value,
+    "RRP":                document.getElementById("rrp").value,
+    "SKU code":           document.getElementById("sku").value.trim(),
+    "Sales Channel":      getSelectedChannels(),
+    "Device Fee":         document.getElementById("deviceFee").value,
+    "Upfront Payment":    document.getElementById("upfrontPayment").value,
+    "Rebate Tenure":      document.getElementById("rebateTenure").value,
+    "No Upfront Payment": document.getElementById("noUpfrontPayment").value,
+    "Campaign code":      document.getElementById("campaignCode")?.value || "",
+    "CUST Group":         document.getElementById("t8Override").checked ? "T8" : "",
   };
 }
 
@@ -1173,7 +1825,10 @@ function validateForm(data) {
     ["Tenure","tenure"],["SKU code","sku"],["RRP","rrp"],
     ["Device Fee","deviceFee"],["Effective Date","effDate"],
   ];
-  if (currentMode === "Upfront") required.push(["Upfront Payment","upfrontPayment"]);
+  const isUSM = currentMode === "Upfront";
+  if (isUSM && usmUpfront === "Upfront") required.push(["Upfront Payment","upfrontPayment"]);
+  if (isUSM && usmUpfront === "Upfront") required.push(["Rebate Tenure","rebateTenure"]);
+  if (isUSM && usmUpfront === "No Upfront") required.push(["No Upfront Payment","noUpfrontPayment"]);
   let ok = true;
   required.forEach(([,id]) => {
     const el = document.getElementById(id);
@@ -1244,17 +1899,33 @@ function updateQueueUI() {
 
 function resetForm() {
   ["phoneGroup","brand","model","color","storage","plan","tenure","sku",
-   "rrp","deviceFee","upfrontPayment","campaignCode","effDate","effTime","expDate","expTime"]
+   "rrp","deviceFee","upfrontPayment","rebateTenure","noUpfrontPayment","campaignCode","effDate","effTime","expDate","expTime"]
     .forEach(id => {
       const el = document.getElementById(id);
       el.value = ""; el.classList.remove("err");
     });
+  document.getElementById("t8Override").checked = false;
+  document.getElementById("t8OverrideLabel").classList.remove("t8-on");
+  // Reset USM sub-selections to defaults
+  document.getElementById("usmConsignment").value = "Non Consignment";
+  document.getElementById("usmUpfront").value = "Upfront";
+  document.getElementById("usmAgreementTag").value = "Upfront";
+  usmConsignment = "Non Consignment";
+  usmUpfront = "Upfront";
   document.querySelectorAll(".ch-pill").forEach(p => {
     p.classList.remove("checked");
     p.querySelector("input").checked = false;
   });
   document.getElementById("formResult").classList.add("hidden");
   document.getElementById("formResult").innerHTML = "";
+}
+
+// ═══════════════════════════════════════════════
+// THEME TOGGLE
+// ═══════════════════════════════════════════════
+function toggleTheme() {
+  const dark = document.body.classList.toggle("dark");
+  document.getElementById("themeLabel").textContent = dark ? "Night" : "Day";
 }
 
 // ═══════════════════════════════════════════════
@@ -1441,27 +2112,27 @@ function renderResult(errorRows, total, containerId) {
 // TEMPLATE DOWNLOAD
 // ═══════════════════════════════════════════════
 function downloadTemplate() {
-  const headers = [
-    "Phone Group","Brand","Model","Color","Storage","Plan","Agreement Type","Tenure",
-    "Agreement Tag","Effective Date","Effective Time","Expiry Date","Expiry Time",
-    "RRP","SKU code","Sales Channel","Device Fee","Upfront Payment","Campaign code"
-  ];
-  const r1 = [
-    "Android","SAMSUNG","GALAXY S25 ULTRA","TITANIUM BLACK","256GB","U Family 128","USM","24",
-    "Upfront","2025-11-01","00:00:00","","",7999,"2203451",
-    "CRM|Eshop|UMREX|Business Customer Care|MCCM|UCC",5999,864,""
-  ];
-  const r2 = [
-    "iPhone","APPLE","IPHONE 16 PRO MAX","DESERT TITANIUM","256GB","U Postpaid 98","UPL","24",
-    "Instalment","2025-11-01","00:00:00","","",6199,"1098765",
-    "CRM|Eshop|Business Customer Care|MCCM",6199,"",""
-  ];
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([headers, r1, r2]);
-  ws["!cols"] = headers.map(h => ({ wch: Math.max(15, h.length+2) }));
-  XLSX.utils.book_append_sheet(wb, ws, "Input");
-  XLSX.writeFile(wb, "CPC_Input_Template.xlsx");
+  // Template pre-built with openpyxl to include real Excel dropdown validation on CUST Group column.
+  // SheetJS does not support writing data validation, so this file is embedded as base64.
+  const b64 = "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";
+  const a = document.createElement("a");
+  a.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + b64;
+  a.download = "CPC_Input_Template.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   showToast("📥 Template downloaded!");
+}
+
+function downloadRulesRef() {
+  const b64 = "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";
+  const a = document.createElement("a");
+  a.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + b64;
+  a.download = "CPC_Rules_Reference.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast("📋 Rules Reference downloaded!");
 }
 
 // ═══════════════════════════════════════════════
